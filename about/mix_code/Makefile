@@ -1,3 +1,4 @@
+# TODO: Add the doc to explain the "arg" and how to use this "Makefile"
 main: add_one.c
 	gcc -g -c add_one.c -o add_one.o
 	ar -crs libadd_one.a add_one.o
