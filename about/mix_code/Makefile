@@ -1,4 +1,21 @@
 # TODO: Add the doc to explain the "arg" and how to use this "Makefile"
+# The files in this dir contain the topic "Mix 'C', 'ASM', 'RUST'".
+#
+# Note: Although the Rust official provide the way to mix 'C' and 'RUST',
+# 	But there also have some trap in the official doc,
+# 	Also they do not provide how to mix 'ASM' and 'RUST' directly.
+# 	So i write this article to explain how to do it :-)
+# 	(I will put the usefull URL that you can get what you want to know,
+# 	Before go to see the content below the "URL", it's better to see the
+# 	"URL" to do some prepare)
+#	Good luck!
+
+# Rust official doc:
+# 	"https://rust-embedded.github.io/book/interoperability/c-with-rust.html"
+# 	"https://rust-embedded.github.io/book/interoperability/rust-with-c.html"
+# 	"https://doc.rust-lang.org/nomicon/ffi.html"
+#
+# 	-------------------------------------------
 main: add_one.c
 	gcc -g -c add_one.c -o add_one.o
 	ar -crs libadd_one.a add_one.o
