@@ -45,6 +45,12 @@
 #		   more msg about to see :
 #		   "https://zh.wikipedia.org/wiki/X86%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A"
 #		   or search "c calling convention" use google chrome.
+#
+#	Usage:
+#		make main
+#		./main
+#		make clean
+#
 main: add_one.c
 	gcc -g -c add_one.c -o add_one.o
 	ar -crs libadd_one.a add_one.o
@@ -53,6 +59,22 @@ main: add_one.c
 #	-----------------------------------------
 #	2. Now we mix "asm" and "Rust"("rust" call "asm" code), and it just like the above what we have talk about
 #	  --:(1) The only different between 2 and 1 just we use the "as" to assembly the "asm" code.
+#	     (2) In "add_one_asm.S" we define the "add_one" as a global symbol so that we can call it in rust(main.rs)
+#	         You should notice that because the "calling convention"("x86 calling convention" wiki page)in x86_64
+#	         use rdi, rsi, rdx... to transfer the arguement, and use the "stack" to store the "func ret address",
+#	         And use the "rax" to hold the "ret value".
+#	         So, "movq %rdi, %rax" mean to get the first arguement that pass by the func and mov it to "rax",
+#	         Then add 1 in "rax", So now the "rax" contain the value we want to return.
+#	         So, we just do "ret" to finish the func.
+#
+#	     (3) In this file(Makefile):
+#		-- "-g": gen debug msg.(as)
+#
+#	Usage:
+#		make asm
+#		./main_use_asm
+#		make asm_clean
+#
 asm:
 	as -g add_one_asm.S -o add.o
 	ar -crs libadd.a add.o
