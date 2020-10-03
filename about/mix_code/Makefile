@@ -16,11 +16,43 @@
 # 	"https://doc.rust-lang.org/nomicon/ffi.html"
 #
 # 	-------------------------------------------
+# 	1. So, we first mix "C" and "Rust" follow the first "URL" give above.("rust" call "C" func)
+# 	  --:(1) I just use the "rustc" to deal the "rust" code, but it's not too difficult for you to convert it 
+# 	  	 to "cargo".
+# 	     (2) In file "main.rs", just put the "C" func in an "extern{}" is OK.
+# 	         But you should translate the "C" func e.g. [int add_one(int x);] to "Rust" e.g.[fn add_one(x: i32)->i32;]
+# 	     (3) You can use the fn just Put the it in an "unsafe" block in main.
+#
+# 	     (4) In "add_one.c" to see the detail define about the "add_one" func.
+#
+# 	     (5) In this file(Makefile):
+# 	     	-- "-g": gen debug msg  ,"-c" compile the c file to gen object file and stop compile.(gcc)
+# 	     	-- "-crs": use "ar" to gen archive file that we will use it to link to the rust file.(ar)
+# 	     	-- "-g": gen debug msg  ,"-L" include the lib file search path(. mean the current dir),
+# 	     	   "-l": link the lib file that refer(staric mean use the static link),So just the "add_one" lib file.
+#
+# 	     	   Note.1: In linux the static lib file name must follow "lib[lib_name].a",So the name we gen lib is
+# 	     	   	 "libadd_one.a",then when you link it to the rust, you just need to refer to "add_one".
+#
+# 	     	   more msg about to see :
+# 	     	   "https://blog.csdn.net/u011247251/article/details/9223557"
+# 	     	   "https://doc.rust-lang.org/rustc/command-line-arguments.html"
+#
+# 	     	   Note.2: In "main.rs" we put the "C" after the extern, this is a "calling convention",
+# 	     	   	   It's ok if you do remove the "C" just use "extern{}" because in "x86_64 linux"just have
+# 	     	   	   the only one calling convention,but if you use "x86" or "windows", you may have to refer
+# 	     	   	   the "C" calling convention
+#		   more msg about to see :
+#		   "https://zh.wikipedia.org/wiki/X86%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A"
+#		   or search "c calling convention" use google chrome.
 main: add_one.c
 	gcc -g -c add_one.c -o add_one.o
 	ar -crs libadd_one.a add_one.o
 	rustc -g main.rs -L. -lstatic=add_one
 
+#	-----------------------------------------
+#	2. Now we mix "asm" and "Rust"("rust" call "asm" code), and it just like the above what we have talk about
+#	  --:(1) The only different between 2 and 1 just we use the "as" to assembly the "asm" code.
 asm:
 	as -g add_one_asm.S -o add.o
 	ar -crs libadd.a add.o
