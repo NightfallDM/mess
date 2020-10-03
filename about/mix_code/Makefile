@@ -114,7 +114,36 @@ clean2:
 #	     	-- "--crate-type": mean let the compile to gen what type output(staticlib just mean static lib file),
 #	     	   "--crate-name": mean to detemine the name of the lib file.(we detemine the "add_three", So in linux it will gen the "libadd_three.a".)(rustc)
 #
-#	     	
+#		-- !!!Notice that:
+#			|_ If you use the ld to link the object file gen by the "ASM"(call_rust.o) code with the lib file gen by the "rust"(libadd_three.a), you will get the Error about the undefine reference "memcpy" ... etc.
+#			   It mean that the the rust lib file calling the c library implicitly,So you may add the "C"
+#			   library file which contain these miss define e.g "memcpy",And you will get other Error when you have link this library, some other undefine Error you will get.
+#			   You can open the two comment lines and comment the line that contain the "gcc" to see this Error.
+#			   Get more info about the Error in:
+#			   "https://os.phil-opp.com/minimal-rust-kernel/" to see the "Memory-Related Intrinsics" section.
+#			|_ Now we use "gcc" to assemble the "ASM" code and link the "rust" lib for use,Because the gcc will search and link the "C" library file automatic.So you will do not see the undefine reference Error about "memcpy",But you also will get other Error.
+#			Because the "gcc" would not link to some lib automatic, you should do it manually,just like the "pthread" and "dl".
+#			About why use "-pthread" but not the "-lpthread" to see below "URL":
+#			"https://stackoverflow.com/questions/2127797/significance-of-pthread-flag-when-compiling"
+#			"https://stackoverflow.com/questions/22180354/why-am-i-getting-undefined-reference-to-pthread-mutexattr-settype"
+#
+#			"-Wl" mean transfer the arguement to the "linker" i.e "ld",So "-Wl,-e" mean "ld -e"
+#
+#			"ld -e" mean detemine the entry point in the program to instead the "main",Because we just 
+#			define the "_start" in the "ASM" code,and we do not define the "main", the "gcc" will automatic make "main" as the entry point,So we just modify it.
+#
+#			"-nostartfiles": because the "gcc" will start the program in "_start" section whick define in  itself library,So we just modify it to tell the "gcc" do not use itself start code,otherwise it will report the 
+#			Multidefine "_start".
+#			Get more message in:
+#			"https://stackoverflow.com/questions/7494244/how-to-change-entry-point-of-c-program-with-gcc"
+#	
+#	[Notice]: Because there do not have the output in "main3", So you have to debug the "main3" to see the "ret value" in "rax" is carrect by your self. :-)
+#	Usage:
+#		make main3
+#		./main3
+#		make clean3
+#
+#	  
 main3: add_three.rs
 	rustc -g --crate-type=staticlib --crate-name=add_three add_three.rs
 	#as -g asm_call_rust.S -o call_rust.o
