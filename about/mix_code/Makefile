@@ -93,7 +93,28 @@ main2: add_two.c
 clean2:
 	rm -f add_two.o add_two.a main_2
 
-
+#	--------------------------------------------
+#	3. Now we mix "Rust" and "asm"("asm" call "rust" fn)
+#	  --:(1) In file "add_three.rs",First you should put the "#[no_mangle]" in the func to make sure that the 
+#	  	 compile do not rename the "add_three" func,otherwise will raise aerror about "undefine reference to 'add_three'".
+#		 You also need to put the pub "pub extern" in the func, the "C" is a calling convention,remove it is OK,But i think it's better to detemine the calling convention explicit.
+#		 The "pub" mean you can access the symbol "add_three", the same as the ".global" in "asm".
+#		 The "extern" mean that you is a func that provide to use it in other place
+#		 (I guess may be in this place,The "extern" work with the "C" to define detemine the calling convention, so may be you can remove the 'extern "c"', you can try it by yourself).
+#
+#	     (2) In file "asm_call_rust.S",you can see the separate steps in the file,i will talk in this place simply
+#	     	 Because we use three arguements,So we push the "rdi", "rsi", "rdx"(calling convention), we also push
+#	     	 the "rax" because it will caontain the "ret value" that after calling the rust func.
+#	     	 Then we setup the three arguements(4, 6, 10),after it you can call the "add_three" func.
+#	     	 After the rust func ret, you can get the ret value in "rax"
+#	     	 Then we will let the state become the same as that before we call the func by pop
+#	     	 When finish these steps, we will call the "exit" systemcall that provide by linux.
+#
+#	     (3) In this file(Makefile):
+#	     	-- "--crate-type": mean let the compile to gen what type output(staticlib just mean static lib file),
+#	     	   "--crate-name": mean to detemine the name of the lib file.(we detemine the "add_three", So in linux it will gen the "libadd_three.a".)(rustc)
+#
+#	     	
 main3: add_three.rs
 	rustc -g --crate-type=staticlib --crate-name=add_three add_three.rs
 	#as -g asm_call_rust.S -o call_rust.o
