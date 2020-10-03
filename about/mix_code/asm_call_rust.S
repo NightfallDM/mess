@@ -10,7 +10,7 @@ _start:
 	pushq %rsi
 	pushq %rdx
 	
-	# x = 4, y = 6, z = 20
+	# x = 4, y = 6, z = 10
 	movq $4, %rdi
 	movq $6, %rsi
 	movq $10, %rdx
