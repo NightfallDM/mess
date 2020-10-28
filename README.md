@@ -1,3 +1,4 @@
 # mess
-jottings:
-	Write what you think
+
+jottings: Write what you think
+
